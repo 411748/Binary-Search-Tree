@@ -4,115 +4,101 @@
 
 using namespace std;
 
-struct Node {
-  int data;
-  Node* left;
-  Node* right;
-};
-
 class BinarySearchTree {
 private:
-  Node* root;
+  int tree[201];
 
-  Node* createNode(int value) {
-    Node* newNode = new Node;
-    newNode->data = value;
-    newNode->left = nullptr;
-    newNode->right = nullptr;
-    return newNode;
-  }
-
-  Node* insert(Node* root, int value) {
-    if (root == nullptr) {
-      return createNode(value);
-    }
-    if (value < root->data) {
-      root->left = insert(root->left, value);
-    } else if (value > root->data) {
-      root->right = insert(root->right, value);
-    }
-    return root;
-  }
-
-  Node* findMin(Node* node) {
-    while (node->left != nullptr) {
-      node = node->left;
-    }
-    return node;
-  }
-
-  Node* remove(Node* root, int value) {
-    if (root == nullptr) {
-      return root;
-    }
-    if (value < root->data) {
-      root->left = remove(root->left, value);
-    } else if (value > root->data) {
-      root->right = remove(root->right, value);
-    } else {
-      if (root->left == nullptr) {
-        Node* temp = root->right;
-        delete root;
-        return temp;
-      } else if (root->right == nullptr) {
-        Node* temp = root->left;
-        delete root;
-        return temp;
-      }
-      Node* temp = findMin(root->right);
-      root->data = temp->data;
-      root->right = remove(root->right, temp->data);
-    }
-    return root;
-  }
-
-  bool search(Node* root, int value) {
-    if (root == nullptr) {
-      return false;
-    }
-    if (root->data == value) {
-      return true;
-    }
-    if (value < root->data) {
-      return search(root->left, value);
-    } else {
-      return search(root->right, value);
-    }
-  }
-
-  void printTree(Node* root, int depth = 0) {
-    if (root == nullptr) {
+  void checkAdjust(int index) {
+    int parent = getParentIndex(index);
+    if (index == 1 || tree[parent] > tree[index]) {
       return;
+    } else {
+      int temp = tree[parent];
+      tree[parent] = tree[index];
+      tree[index] = temp;
+      checkAdjust(parent);
     }
-    printTree(root->right, depth + 1);
-    for (int i = 0; i < depth; ++i) {
-      cout << "\t";
+  }
+
+  int getParentIndex(int i) {
+    if (i % 2 == 0) {
+      return i / 2;
+    } else {
+      return (i - 1) / 2;
     }
-    cout << root->data << endl;
-    printTree(root->left, depth + 1);
+  }
+
+  int getLastIndex() {
+    int i = 1;
+    while (true) {
+      if (tree[i] == -1) {
+        return i;
+      }
+      i++;
+    }
+    cout << "ERROR: Tree is full" << endl;
+    return -1;
+  }
+
+  int searchIndex(int value) {
+    for (int i = 1; i <= 100; i++) {
+      if (tree[i] == value) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  void shiftDown(int index) {
+    int leftChild = 2 * index;
+    int rightChild = 2 * index + 1;
+    int largest = index;
+
+    if (leftChild <= 100 && tree[leftChild] > tree[largest]) {
+      largest = leftChild;
+    }
+
+    if (rightChild <= 100 && tree[rightChild] > tree[largest]) {
+      largest = rightChild;
+    }
+
+    if (largest != index) {
+      swap(tree[index], tree[largest]);
+      shiftDown(largest);
+    }
   }
 
 public:
-  BinarySearchTree() : root(nullptr) {}
+  BinarySearchTree() {
+    clear();
+  }
 
   void insert(int value) {
-    root = insert(root, value);
+    int index = getLastIndex();
+    if (index == 100) {
+      return;
+    }
+    tree[index] = value;
+    checkAdjust(index);
   }
 
-  bool contains(int value) {
-    return search(root, value);
-  }
-
-  void remove(int value) {
-    root = remove(root, value);
+  void printIndented(int index, int depth = 0) {
+    if (index <= 100 && tree[index] != -1) {
+      printIndented(2 * index + 1, depth + 1);
+      for (int i = 0; i < depth; ++i) {
+        cout << "\t";
+      }
+      cout << tree[index] << endl;
+      printIndented(2 * index, depth + 1);
+    }
   }
 
   void printTree() {
     cout << "Binary Search Tree:" << endl;
-    printTree(root);
+    printIndented(1);
   }
 
-  void addFromFile() {
+   void addFromFile() {
     int numCount;
     cout << "Enter the number of numbers you want to add from file: ";
     cin >> numCount;
@@ -124,6 +110,39 @@ public:
     file.close();
   }
 
+  void clear() {
+    for (int i = 0; i < 201; i++) {
+      tree[i] = -1;
+    }
+    tree[0] = -2;
+  }
+
+  void searchNumber() {
+    int value;
+    cout << "Enter number to search: ";
+    cin >> value;
+    int index = searchIndex(value);
+    if (index != -1) {
+      cout << "Number " << value << " is found in the tree." << endl;
+    } else {
+      cout << "Number " << value << " is not found in the tree." << endl;
+    }
+  }
+
+  void deleteNumber() {
+    int value;
+    cout << "Enter number to delete: ";
+    cin >> value;
+    int index = searchIndex(value);
+    if (index != -1) {
+      tree[index] = -1;
+      shiftDown(index);
+      cout << "Number " << value << " has been deleted from the tree." << endl;
+    } else {
+      cout << "Number " << value << " is not found in the tree." << endl;
+    }
+  }
+
   void addNumbersManually() {
     int numCount;
     cout << "Enter the number of numbers you want to add manually: ";
@@ -133,24 +152,6 @@ public:
       int num;
       cin >> num;
       insert(num);
-    }
-  }
-
-  void deleteNumber() {
-    int value;
-    cout << "Enter number to delete: ";
-    cin >> value;
-    remove(value);
-  }
-
-  void searchNumber() {
-    int value;
-    cout << "Enter number to search: ";
-    cin >> value;
-    if (search(root, value)) {
-      cout << "Number " << value << " is found in the tree." << endl;
-    } else {
-      cout << "Number " << value << " is not found in the tree." << endl;
     }
   }
 };
@@ -168,7 +169,7 @@ int main() {
     cout << "D: Delete number" << endl;
     cout << "S: Search for number" << endl;
     cout << "Q: Quit" << endl;
-    cout << "Enter choice: " << endl;
+    cout << "Enter choice: ";
     cin >> choice;
 
     if (strcmp(choice, "A") == 0) {
