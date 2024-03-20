@@ -29,7 +29,20 @@ private:
     } else if (value > root->data) {
       root->right = insert(root->right, value);
     }
-    return root;
+      return root;
+  }
+
+  bool search(Node* root, int value) {
+    if (root == nullptr) {
+      return false;
+    }
+    if (root->data == value) {
+      return true;
+    } else if (value < root->data) {
+      return search(root->left, value);
+    } else {
+      return search(root->right, value);
+    }
   }
 
   void printTree(Node* root, int depth) {
@@ -44,12 +57,16 @@ private:
 	
     printTree(root->left, depth + 1);
   }
-
+  
 public:
   BinarySearchTree() : root(nullptr) {}
 
   void insert(int value) {
     root = insert(root, value);
+  }
+
+  bool contains(int value) {
+    return search(root, value);
   }
 
   void printTree() {
@@ -66,5 +83,20 @@ int main() {
   tree.insert(20);
   tree.insert(40);
   tree.printTree();
+
+  int searchValue = 30;
+  if (tree.contains(searchValue)) {
+    cout << "Searching for " << searchValue << ": Found" << endl;
+  } else {
+    cout << "Searching for " << searchValue << ": Not Found" << endl;
+  }
+
+  searchValue = 60;
+  if (tree.contains(searchValue)) {
+    cout << "Searching for " << searchValue << ": Found" << endl;
+  } else {
+    cout << "Searching for " << searchValue << ": Not Found" << endl;
+  }
+    
   return 0;
 }
