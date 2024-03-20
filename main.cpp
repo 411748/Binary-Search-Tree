@@ -1,19 +1,26 @@
+//Nick Braun
+//3/20/2024
+//Binary Search Tree - Right children are bigger, Left are smaller. User can add manually, from file, delete, print, or search for numbers in tree
+//Includes
 #include <iostream>
 #include <cstring>
 #include <fstream>
 
 using namespace std;
 
+//Struct for the trees nodes
 struct Node {
   int data;
   Node* left;
   Node* right;
 };
 
+//main class with funcs
 class BinarySearchTree {
 private:
   Node* root;
 
+  //creating a new node with data
   Node* createNode(int value) {
     Node* newNode = new Node;
     newNode->data = value;
@@ -22,6 +29,7 @@ private:
     return newNode;
   }
 
+  //inserting a number to the tree and seeing where the root will be
   Node* insert(Node* root, int value) {
     if (root == nullptr) {
       return createNode(value);
@@ -34,6 +42,7 @@ private:
     return root;
   }
 
+  //find min func used when removing
   Node* findMin(Node* node) {
     while (node->left != nullptr) {
       node = node->left;
@@ -41,6 +50,7 @@ private:
     return node;
   }
 
+  //removing function that will automatically fix tree after deleting 
   Node* remove(Node* root, int value) {
     if (root == nullptr) {
       return root;
@@ -66,6 +76,7 @@ private:
     return root;
   }
 
+  //func that will return either true or false for searching for a num in tree
   bool search(Node* root, int value) {
     if (root == nullptr) {
       return false;
@@ -80,6 +91,7 @@ private:
     }
   }
 
+  //func to print tree
   void printTree(Node* root, int depth = 0) {
     if (root == nullptr) {
       return;
@@ -95,30 +107,35 @@ private:
 public:
   BinarySearchTree() : root(nullptr) {}
 
+  //func that calls insert with root and value
   void insert(int value) {
     root = insert(root, value);
   }
-
+  //func that calls search with root and value
   bool contains(int value) {
     return search(root, value);
   }
-
+  //func that calls remove with root and value
   void remove(int value) {
     root = remove(root, value);
   }
-
+  //func that calls printtree with the root
   void printTree() {
     cout << "Binary Search Tree:" << endl;
     printTree(root);
   }
 };
 
+//main
 int main() {
+  //creating tree and a char to find user input
   BinarySearchTree tree;
   int running = 1;
   char choice[3];
 
+  //not quit yet
   while(running) {
+    //giving options
     cout << "Select an option:" << endl;
     cout << "A: Add numbers manually" << endl;
     cout << "AF: Add numbers from file" << endl;
@@ -129,6 +146,7 @@ int main() {
     cout << "Enter choice: ";
     cin >> choice;
 
+    //checking for choices and using made functions to complete tasks needed
     if(strcmp(choice, "A") == 0) {
       int count;
       cout << "Enter how many numbers you want to add: " << endl;
