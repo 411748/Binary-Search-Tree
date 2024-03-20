@@ -29,7 +29,39 @@ private:
     } else if (value > root->data) {
       root->right = insert(root->right, value);
     }
+    return root;
+  }
+
+  Node* findMin(Node* node) {
+    while (node->left != nullptr) {
+      node = node->left;
+    }
+    return node;
+  }
+
+  Node* remove(Node* root, int value) {
+    if (root == nullptr) {
       return root;
+    }
+    if (value < root->data) {
+      root->left = remove(root->left, value);
+    } else if (value > root->data) {
+      root->right = remove(root->right, value);
+    } else {
+      if (root->left == nullptr) {
+        Node* temp = root->right;
+        delete root;
+        return temp;
+      } else if (root->right == nullptr) {
+        Node* temp = root->left;
+        delete root;
+        return temp;
+      }
+      Node* temp = findMin(root->right);
+      root->data = temp->data;
+      root->right = remove(root->right, temp->data);
+    }
+    return root;
   }
 
   bool search(Node* root, int value) {
@@ -38,26 +70,26 @@ private:
     }
     if (root->data == value) {
       return true;
-    } else if (value < root->data) {
+    }
+    if (value < root->data) {
       return search(root->left, value);
     } else {
       return search(root->right, value);
     }
   }
 
-  void printTree(Node* root, int depth) {
-    if (root == nullptr)
+  void printTree(Node* root, int depth = 0) {
+    if (root == nullptr) {
       return;
-
+    }
     printTree(root->right, depth + 1);
-
-    for (int i = 0; i < depth; ++i)
+    for (int i = 0; i < depth; ++i) {
       cout << "\t";
+    }
     cout << root->data << endl;
-	
     printTree(root->left, depth + 1);
   }
-  
+
 public:
   BinarySearchTree() : root(nullptr) {}
 
@@ -69,9 +101,13 @@ public:
     return search(root, value);
   }
 
+  void remove(int value) {
+    root = remove(root, value);
+  }
+
   void printTree() {
     cout << "Binary Search Tree:" << endl;
-    printTree(root, 0);
+    printTree(root);
   }
 };
 
@@ -97,6 +133,11 @@ int main() {
   } else {
     cout << "Searching for " << searchValue << ": Not Found" << endl;
   }
-    
+
+  int removeValue = 30;
+  tree.remove(removeValue);
+  cout << "After removing " << removeValue << ":" << endl;
+  tree.printTree();
+
   return 0;
 }
